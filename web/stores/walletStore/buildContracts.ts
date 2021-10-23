@@ -12,13 +12,11 @@ const EVENT_MACHINE_ABI = [
 const { NEXT_PUBLIC_EVENT_MACHINE_CONTRACT: EVENT_MACHINE_CONTRACT } =
   process.env;
 
-export interface Contracts extends any {}
-
 export default async function buildContracts(
   ethers: any,
   ethAddress: string,
   provider: ethers.providers.Web3Provider
-): Promise<Contracts> {
+): Promise<any> {
   const signer = provider.getSigner();
   const eventMachine = new ethers.Contract(
     EVENT_MACHINE_CONTRACT,
@@ -71,7 +69,7 @@ export default async function buildContracts(
     },
 
     isRedeemed: async (eventId: string, address: string) => {
-      return readOnlyEventMachineContract.isRedeemed(eventId, address)
+      return readOnlyEventMachineContract.isRedeemed(eventId, address);
     },
   };
 }
