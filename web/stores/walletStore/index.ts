@@ -1,7 +1,7 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import type { providers } from "ethers";
 import create from "zustand";
-import buildContracts, { Contracts } from "./buildContracts";
+import buildContracts from "./buildContracts";
 
 const initialState = {
   web3Provider: undefined,
@@ -12,7 +12,7 @@ const initialState = {
 const useWalletStore = create<{
   web3Provider?: providers.Web3Provider;
   ethAddress?: string;
-  contracts?: Contracts;
+  contracts?: any;
   walletConnectProvider?: WalletConnectProvider;
   ethers?: any;
   connect: () => Promise<void>;
