@@ -1,3 +1,4 @@
+/* eslint-disable node/no-unsupported-features/es-syntax */
 import * as dotenv from "dotenv";
 import { HardhatUserConfig, task } from "hardhat/config";
 import "@typechain/hardhat";
@@ -77,8 +78,14 @@ const config: HardhatUserConfig = {
       blockGasLimit: 10000000,
       initialBaseFeePerGas: 0, // workaround from https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136 . Remove when that issue is closed.
     },
-    rinkeby: ETH_PRIVATE_KEY ? createNetworkConfig("rinkeby") : undefined,
-    ropsten: ETH_PRIVATE_KEY ? createNetworkConfig("ropsten") : undefined,
+    ...{
+      ...(ETH_PRIVATE_KEY
+        ? {
+            rinkeby: createNetworkConfig("rinkeby"),
+            ropsten: createNetworkConfig("ropsten"),
+          }
+        : {}),
+    },
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
