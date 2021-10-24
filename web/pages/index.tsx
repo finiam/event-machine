@@ -35,7 +35,9 @@ const Home: NextPage = () => {
               eventDate
               status
             }
-            myTickets: tickets(where: { buyer: $ethAddress, status_not: canceled }) {
+            myTickets: tickets(
+              where: { buyer: $ethAddress, status_not: canceled }
+            ) {
               id
               eventId
               buyer
@@ -61,14 +63,21 @@ const Home: NextPage = () => {
             <p>{ethAddress}</p>
           </div>
           <div className="mt-12">
-            <input
-              type="datetime-local"
-              onChange={(event) => setDate(event.target.value)}
-            />
-            <input
-              type="text"
-              onChange={(event) => setPrice(event.target.value)}
-            />
+            <label>
+              Event Date
+              <input
+                type="datetime-local"
+                onChange={(event) => setDate(event.target.value)}
+              />
+            </label>
+
+            <label>
+              Ticket price
+              <input
+                type="text"
+                onChange={(event) => setPrice(event.target.value)}
+              />
+            </label>
             <button
               className="bg-gray-200 shadow rounded p-2 "
               onClick={async () => {
