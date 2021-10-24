@@ -35,7 +35,7 @@ const Home: NextPage = () => {
               eventDate
               status
             }
-            myTickets: tickets(where: { buyer: $ethAddress }) {
+            myTickets: tickets(where: { buyer: $ethAddress, status_not: canceled }) {
               id
               eventId
               buyer
@@ -62,7 +62,7 @@ const Home: NextPage = () => {
           </div>
           <div className="mt-12">
             <input
-              type="date"
+              type="datetime-local"
               onChange={(event) => setDate(event.target.value)}
             />
             <input
