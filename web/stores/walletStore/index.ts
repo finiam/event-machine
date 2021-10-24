@@ -29,6 +29,7 @@ const useWalletStore = create<{
     const walletConnectProvider = new WalletConnectProvider({
       infuraId: "68bf6cf6914246ef9f2b8f1c30176a6a",
       qrcode: true,
+      chainId: 3,
     });
     await walletConnectProvider.enable();
     const ethers = await import("ethers");

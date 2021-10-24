@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+button {
+  @apply bg-gray-200 shadow rounded p-2;
+}

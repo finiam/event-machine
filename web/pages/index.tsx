@@ -2,30 +2,53 @@
 import { formatEther } from "@ethersproject/units";
 import type { NextPage } from "next";
 import { useState } from "react";
-import { useQuery } from "react-query";
 import Link from "next/link";
 import useWalletStore from "../stores/walletStore";
 import Connect from "../components/Connect";
+import { useQuery } from "react-query";
+import { request, gql } from "graphql-request";
 
 const Home: NextPage = () => {
   const { ethAddress, contracts } = useWalletStore();
   const [date, setDate] = useState("");
   const [price, setPrice] = useState("");
-  const { data: myEvents } = useQuery(
-    ["myEvents", !!contracts],
-    () => contracts?.getMyEvents(),
-    { refetchInterval: 2500 }
+  const { data } = useQuery(
+    ["homepagedata", ethAddress],
+    () =>
+      request(
+        "https://api.thegraph.com/subgraphs/name/finiam/event-machine",
+        gql`
+          query ($ethAddress: String!) {
+            myEvents: events(where: { creator: $ethAddress }) {
+              id
+              creator
+              eventId
+              eventPrice
+              eventDate
+              status
+            }
+            otherEvents: events(where: { creator_not: $ethAddress }) {
+              id
+              creator
+              eventId
+              eventPrice
+              eventDate
+              status
+            }
+            myTickets: tickets(where: { buyer: $ethAddress }) {
+              id
+              eventId
+              buyer
+              status
+            }
+          }
+        `,
+        { ethAddress: ethAddress?.toLowerCase() || "" }
+      ),
+    { enabled: !!ethAddress, refetchInterval: 2000 }
   );
-  const { data: otherEvents } = useQuery(
-    ["otherEvents", !!contracts],
-    () => contracts?.getOtherEvents(),
-    { refetchInterval: 2500 }
-  );
-  const { data: myTickets } = useQuery(
-    ["myTickets", !!contracts],
-    () => contracts?.getMyTickets(),
-    { refetchInterval: 2500 }
-  );
+
+  console.log(data);
 
   return (
     <div className="p-8">
@@ -60,17 +83,17 @@ const Home: NextPage = () => {
         </>
       )}
 
-      {myEvents && (
+      {data?.myEvents && (
         <div className="mt-12">
           <p className="text-xl font-bold">Your created events</p>
-          {myEvents.map((event: any) => (
-            <div key={event.transactionHash} className="flex pt-4 space-x-4">
-              <p>{event.args[1].toString()}</p>
+          {data.myEvents.map((event: any) => (
+            <div key={event.id} className="flex pt-4 space-x-4">
+              <p>{event.id}</p>
 
-              <p>{formatEther(event.args[2])} ETH</p>
+              <p>{formatEther(event.eventPrice)} ETH</p>
 
               <p>
-                {new Date(event.args[3].toNumber() * 1000).toLocaleString(
+                {new Date(Number(event.eventDate) * 1000).toLocaleString(
                   "en-us"
                 )}
               </p>
@@ -79,24 +102,24 @@ const Home: NextPage = () => {
         </div>
       )}
 
-      {otherEvents && (
+      {data?.otherEvents && (
         <div className="mt-12">
           <p className="text-xl font-bold">Other events</p>
-          {otherEvents.map((event: any) => (
-            <div key={event.transactionHash} className="flex pt-4 space-x-4">
-              <p>{event.args[1].toString()}</p>
+          {data.otherEvents.map((event: any) => (
+            <div key={event.id} className="flex pt-4 space-x-4">
+              <p>{event.id}</p>
 
-              <p>{formatEther(event.args[2])} ETH</p>
+              <p>{formatEther(event.eventPrice)} ETH</p>
 
               <p>
-                {new Date(event.args[3].toNumber() * 1000).toLocaleString(
+                {new Date(Number(event.eventDate) * 1000).toLocaleString(
                   "en-us"
                 )}
               </p>
 
               <button
                 onClick={() => {
-                  contracts?.buyTicket(event.args[1], event.args[2]);
+                  contracts?.buyTicket(event.eventId, event.eventPrice);
                 }}
               >
                 Buy Ticket
@@ -106,16 +129,16 @@ const Home: NextPage = () => {
         </div>
       )}
 
-      {myTickets && (
+      {data?.myTickets && (
         <div className="mt-12">
           <p className="text-xl font-bold">Your tickets</p>
-          {myTickets.map((ticket: any) => (
-            <div key={ticket.transactionHash} className="flex pt-4 space-x-4">
-              <p>{ticket.args[1].toString()}</p>
+          {data.myTickets.map((ticket: any) => (
+            <div key={ticket.id} className="flex pt-4 space-x-4">
+              <p>{ticket.eventId}</p>
 
               <button
                 onClick={() => {
-                  contracts?.useTicket(ticket.args[1]);
+                  contracts?.useTicket(ticket.eventId);
                 }}
               >
                 Use Ticket
@@ -123,13 +146,13 @@ const Home: NextPage = () => {
 
               <button
                 onClick={() => {
-                  contracts?.cancelTicket(ticket.args[1]);
+                  contracts?.cancelTicket(ticket.eventId);
                 }}
               >
                 Cancel Ticket
               </button>
 
-              <Link passHref href={`/events/${ticket.args[1].toString()}`}>
+              <Link passHref href={`/events/${ticket.eventId}`}>
                 <a>Validate ticket</a>
               </Link>
             </div>
