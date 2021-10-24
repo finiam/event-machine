@@ -8,6 +8,7 @@ const EVENT_MACHINE_ABI = [
   "function useTicket(uint256 eventId) public",
   "function isRedeemed(uint256 eventId, address addr) public view returns (bool)",
   `event CreateEvent(address indexed creator, uint256 eventId, uint256 eventPrice, uint256 eventDate)`,
+  `event BuyTicket(address indexed buyer, uint256 eventId)`,
 ];
 const { NEXT_PUBLIC_EVENT_MACHINE_CONTRACT: EVENT_MACHINE_CONTRACT } =
   process.env;
@@ -65,6 +66,12 @@ export default async function buildContracts(
       ).filter(
         (transaction: any) =>
           transaction.args[0].toLowerCase() !== ethAddress.toLowerCase()
+      );
+    },
+
+    getMyTickets: async () => {
+      return readOnlyEventMachineContract.queryFilter(
+        eventMachine.filters.BuyTicket(ethAddress)
       );
     },
 

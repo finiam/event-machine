@@ -1,5 +1,6 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import type { providers } from "ethers";
+import detectEthereumProvider from "@metamask/detect-provider";
 import create from "zustand";
 import buildContracts from "./buildContracts";
 
@@ -16,6 +17,7 @@ const useWalletStore = create<{
   walletConnectProvider?: WalletConnectProvider;
   ethers?: any;
   connect: () => Promise<void>;
+  connectMetamask: () => Promise<void>;
   disconnect: () => Promise<void>;
 }>((set, get) => ({
   ...initialState,
@@ -43,6 +45,25 @@ const useWalletStore = create<{
     set({
       ethers,
       walletConnectProvider,
+      web3Provider,
+      ethAddress,
+      contracts,
+    });
+  },
+
+  connectMetamask: async () => {
+    const provider = await detectEthereumProvider();
+    const ethers = await import("ethers");
+    const web3Provider = new ethers.providers.Web3Provider(provider);
+    await ((window as any).ethereum as any).request({
+      method: "eth_requestAccounts",
+    });
+    const signer = web3Provider.getSigner();
+    const ethAddress = await signer.getAddress();
+    const contracts = await buildContracts(ethers, ethAddress, web3Provider);
+
+    set({
+      ethers,
       web3Provider,
       ethAddress,
       contracts,

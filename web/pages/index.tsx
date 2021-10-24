@@ -3,10 +3,12 @@ import { formatEther } from "@ethersproject/units";
 import type { NextPage } from "next";
 import { useState } from "react";
 import { useQuery } from "react-query";
+import Link from "next/link";
 import useWalletStore from "../stores/walletStore";
+import Connect from "../components/Connect";
 
 const Home: NextPage = () => {
-  const { connect, disconnect, ethAddress, contracts } = useWalletStore();
+  const { ethAddress, contracts } = useWalletStore();
   const [date, setDate] = useState("");
   const [price, setPrice] = useState("");
   const { data: myEvents } = useQuery(["myEvents", !!contracts], () =>
@@ -15,25 +17,16 @@ const Home: NextPage = () => {
   const { data: otherEvents } = useQuery(["otherEvents", !!contracts], () =>
     contracts?.getOtherEvents()
   );
-
-  console.log(otherEvents);
+  const { data: myTickets } = useQuery(["myTickets", !!contracts], () =>
+    contracts?.getMyTickets()
+  );
 
   return (
     <div className="p-8">
-      {!ethAddress && (
-        <button className="bg-gray-200 shadow rounded p-2" onClick={connect}>
-          Connect Wallet using WalletConnect
-        </button>
-      )}
+      <Connect />
 
       {ethAddress && (
         <>
-          <button
-            className="bg-gray-200 shadow rounded p-2"
-            onClick={disconnect}
-          >
-            Disconnect Wallet using WalletConnect
-          </button>
           <div className="mt-12">
             <p className="text-xl font-bold">Your eth address:</p>
             <p>{ethAddress}</p>
@@ -102,10 +95,21 @@ const Home: NextPage = () => {
               >
                 Buy Ticket
               </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {myTickets && (
+        <div className="mt-12">
+          <p className="text-xl font-bold">Your tickets</p>
+          {myTickets.map((ticket: any) => (
+            <div key={ticket.transactionHash} className="flex pt-4 space-x-4">
+              <p>{ticket.args[1].toString()}</p>
 
               <button
                 onClick={() => {
-                  contracts?.useTicket(event.args[1]);
+                  contracts?.useTicket(ticket.args[1]);
                 }}
               >
                 Use Ticket
@@ -113,13 +117,15 @@ const Home: NextPage = () => {
 
               <button
                 onClick={() => {
-                  contracts?.cancelTicket(event.args[1]);
+                  contracts?.cancelTicket(ticket.args[1]);
                 }}
               >
                 Cancel Ticket
               </button>
 
-              <a href={`/events/${event.args[1].toString()}`}>Event page</a>
+              <Link passHref href={`/events/${ticket.args[1].toString()}`}>
+                <a>Validate ticket</a>
+              </Link>
             </div>
           ))}
         </div>

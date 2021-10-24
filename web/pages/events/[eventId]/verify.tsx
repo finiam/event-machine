@@ -1,12 +1,13 @@
 import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Connect from "../../../components/Connect";
 import useWalletStore from "../../../stores/walletStore";
 
 export default function VerifyPage() {
   const { query } = useRouter();
   const { eventId } = query;
-  const { contracts, connect } = useWalletStore();
+  const { contracts } = useWalletStore();
   const [validTicket, setValidTicket] = useState<boolean>();
   const [error, setError] = useState<unknown>();
 
@@ -31,11 +32,7 @@ export default function VerifyPage() {
 
   return (
     <div>
-      {!contracts && (
-        <button className="bg-gray-200 shadow rounded p-2" onClick={connect}>
-          Validate
-        </button>
-      )}
+      <Connect />
 
       <p>{validTicket === true && "Valid ticket!"}</p>
 

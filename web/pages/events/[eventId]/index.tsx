@@ -6,11 +6,12 @@ import { useQuery } from "react-query";
 import QRCode from "qrcode";
 import useWalletStore from "../../../stores/walletStore";
 import { useRouter } from "next/router";
+import Connect from "../../../components/Connect";
 
 export default function EventPage() {
   const { query } = useRouter();
   const { eventId } = query;
-  const { connect, disconnect, ethAddress, web3Provider } = useWalletStore();
+  const { ethAddress, web3Provider } = useWalletStore();
   const [qrcode, setQrcode] = useState<string>();
   const [url, setUrl] = useState<string>();
 
@@ -18,20 +19,10 @@ export default function EventPage() {
     <div className="p-8">
       <h1>Event {eventId}</h1>
 
-      {!ethAddress && (
-        <button className="bg-gray-200 shadow rounded p-2" onClick={connect}>
-          Connect Wallet using WalletConnect
-        </button>
-      )}
+      <Connect />
 
       {ethAddress && (
         <>
-          <button
-            className="bg-gray-200 shadow rounded p-2"
-            onClick={disconnect}
-          >
-            Disconnect Wallet using WalletConnect
-          </button>
           <div className="mt-12">
             <p className="text-xl font-bold">Your eth address:</p>
             <p>{ethAddress}</p>
