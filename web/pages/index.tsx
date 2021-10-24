@@ -11,14 +11,20 @@ const Home: NextPage = () => {
   const { ethAddress, contracts } = useWalletStore();
   const [date, setDate] = useState("");
   const [price, setPrice] = useState("");
-  const { data: myEvents } = useQuery(["myEvents", !!contracts], () =>
-    contracts?.getMyEvents()
+  const { data: myEvents } = useQuery(
+    ["myEvents", !!contracts],
+    () => contracts?.getMyEvents(),
+    { refetchInterval: 2500 }
   );
-  const { data: otherEvents } = useQuery(["otherEvents", !!contracts], () =>
-    contracts?.getOtherEvents()
+  const { data: otherEvents } = useQuery(
+    ["otherEvents", !!contracts],
+    () => contracts?.getOtherEvents(),
+    { refetchInterval: 2500 }
   );
-  const { data: myTickets } = useQuery(["myTickets", !!contracts], () =>
-    contracts?.getMyTickets()
+  const { data: myTickets } = useQuery(
+    ["myTickets", !!contracts],
+    () => contracts?.getMyTickets(),
+    { refetchInterval: 2500 }
   );
 
   return (

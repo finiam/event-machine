@@ -1,0 +1,30 @@
+enum EventStatus {
+  open
+  canceled
+}
+
+type Event @entity {
+  id: ID!
+  creator: String!
+  eventId: BigInt!
+  eventPrice: BigInt!
+  eventDate: BigInt!
+  status: EventStatus!
+  tickets: [Ticket!]
+}
+
+enum TicketStatus {
+  empty
+  bought
+  canceled
+  redeemed
+}
+
+type Ticket @entity {
+  id: ID!
+  eventId: BigInt!
+  event: Event!
+  buyer: String!
+  canceled: Boolean!
+  status: TicketStatus!
+}

@@ -1,0 +1,36 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: EventMachine
+    network: ropsten
+    source:
+      address: "0xE1DD37df48F1FD91c2aF76Ca85e62DA83447a9D9"
+      abi: EventMachine
+      startBlock: 11286829
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - BuyTicket
+        - CancelEvent
+        - CancelTicket
+        - CreateEvent
+        - UseTicket
+      abis:
+        - name: EventMachine
+          file: ./abis/EventMachine.json
+      eventHandlers:
+        - event: BuyTicket(indexed address,uint256)
+          handler: handleBuyTicket
+        - event: CancelEvent(indexed address,uint256)
+          handler: handleCancelEvent
+        - event: CancelTicket(indexed address,uint256)
+          handler: handleCancelTicket
+        - event: CreateEvent(indexed address,uint256,uint256,uint256)
+          handler: handleCreateEvent
+        - event: UseTicket(indexed address,uint256)
+          handler: handleUseTicket
+      file: ./src/mapping.ts
