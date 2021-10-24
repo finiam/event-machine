@@ -55,7 +55,7 @@ const useWalletStore = create<{
   connectMetamask: async () => {
     const provider = await detectEthereumProvider();
     const ethers = await import("ethers");
-    const web3Provider = new ethers.providers.Web3Provider(provider);
+    const web3Provider = new ethers.providers.Web3Provider(provider as any);
     await ((window as any).ethereum as any).request({
       method: "eth_requestAccounts",
     });
